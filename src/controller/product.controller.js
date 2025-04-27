@@ -6,28 +6,59 @@ dotenv.config();
 
 const addProduct = async (req, res) => {
     try {
-        // Destructure validated product fields from request
-        const { image, title, description, price, haveAddon, addonMenu } = req.productAddValidate;
+        const { image, title, description, price,  have_addon, addItems } = req.productAddValidate;
+        console.log("=-=0=0=0=0=0=-",req.productAddValidate)
+
         
-        // Generate the image URL based on server path
         const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${image.filename}`;
 
-        // Create and save new product in the database
+
+        if (have_addon) { 
+            try {
+                if (!Array.isArray(addItems) || addItems.length === 0) {
+                    console.log("step x1")
+                    return res.status(400).json({
+                        errorMessage: "Please add at least one AddOnMenu item",
+                        
+                    });
+                   
+                }
+            } catch (parseError) {
+                console.log("step x2")
+                return res.status(400).json({
+                    message: "Invalid addonMenu JSON format",
+                    error: parseError.message,
+                });
+            }
+        }
+
         const productStore = await products.create({
             title,
             description,
             price,
             image: imageUrl,
+            haveAddon: !! have_addon
         });
 
-        // Send success response with inserted product data
+        let addonMenuData = null;
+
+        if (productStore.haveAddon) {
+
+            const addonMenuWithProductId = addItems.map((addon) => ({
+                ...addon,
+                productId: productStore._id,
+            }));
+
+            addonMenuData = await addonmenus.insertMany(addonMenuWithProductId);
+        }
+
         return res.status(200).json({
             message: "Data inserted successfully",
             product: productStore,
+            addonMenu: addonMenuData,
         });
 
     } catch (error) {
-        // Handle any error during product insertion
         console.error("Error inserting product:", error);
         return res.status(500).json({
             message: "Something went wrong while adding product",
@@ -35,6 +66,7 @@ const addProduct = async (req, res) => {
         });
     }
 };
+
 
 
   

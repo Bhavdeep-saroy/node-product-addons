@@ -4,16 +4,27 @@ const addProductSchema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
-    addonMenu: Joi.any().optional(),
+  
+    addItems: Joi.array()
+      .items(
+        Joi.object({
+          title: Joi.string().required(),
+          price: Joi.number().required(),
+        }).unknown(true)
+      )
+      .required(),
+  
     image: Joi.object({
-        originalname: Joi.string().required(),
-        mimetype: Joi.string()
-            .valid('image/jpeg', 'image/png', 'image/jpg', 'image/webp')
-            .required(),
-        size: Joi.number().max(2 * 1024 * 1024).required()
-    }).unknown(true).required()
-})
-.unknown(true);
+      originalname: Joi.string().required(),
+      mimetype: Joi.string()
+        .valid('image/jpeg', 'image/png', 'image/jpg', 'image/webp')
+        .required(),
+      size: Joi.number().max(2 * 1024 * 1024).required(),
+    })
+      .unknown(true)
+      .required(),
+  }).unknown(true);
+  
 
 
 const addOnMenusSchema = Joi.object({

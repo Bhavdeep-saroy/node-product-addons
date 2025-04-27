@@ -2,6 +2,9 @@ import {addProductSchema, addOnMenusSchema} from "./index.js"
 
 
 const productAddValidate = (req, res, next) => {
+
+    
+    
     //console.log("-0=-0=9-8878tyhgjhjaxhsajajaSIUADWIYEDIQWYEYQW",req.body)
     req.body.image =req.file ? req.file : null;
 
